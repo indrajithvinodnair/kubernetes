@@ -9,7 +9,8 @@ class kubeOps:
         self.config = configparser.ConfigParser()
         self.config.read("config.ini")
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh.connect('3.110.219.249', username='ubuntu', password='', key_filename='cptblackbeardsEC2Instance.pem')
+       
+        self.ssh.connect(self.config['CREDENTIALS']['ssh_ip'], username=self.config['CREDENTIALS']['ssh_username'], password='', key_filename=self.config['CREDENTIALS']['pem_file_path'])
         print(Fore.GREEN+"****************** Connection Established  ******************")
         print(Fore.GREEN+"****************** Starting Docker and kubectl  ******************")
         print(Style.RESET_ALL)
