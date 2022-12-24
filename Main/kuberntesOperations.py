@@ -7,14 +7,14 @@ class kubeOps:
     def __init__(self):
         self.ssh = paramiko.SSHClient()
         self.config = configparser.ConfigParser()
-        self.config.read("/home/cptblackbeard/Programes/python/kubernetes/Main/config.ini")
+        self.config.read("config.ini")
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh.connect('3.110.219.249', username='ubuntu', password='', key_filename='cptblackbeardsEC2Instance.pem')
         print(Fore.GREEN+"****************** Connection Established  ******************")
         print(Fore.GREEN+"****************** Starting Docker and kubectl  ******************")
         print(Style.RESET_ALL)
         stdin,stdout, stderr = self.ssh.exec_command('ls -a')
-        self.showSSHOutput(stdout.readline)
+        self.showSSHOutPutLongRunningCommand(stdout)
         
 
 
@@ -116,7 +116,8 @@ class kubeOps:
         deploymentName=input(Fore.BLUE+"Enter the name of the deployment you want to perform rolling update on: ")
         print(Fore.GREEN+"*******************  Performing rolling update on deployment {deployment}  **********************   ".format(deployment=deploymentName))
         try:
-            if(deploymentName!="nginx-deployment" or deploymentName!="busybox-deployment"):
+            supportedDeployments=["nginx-deployment","busybox-deployment"]
+            if(deploymentName not in supportedDeployments):
                 print(Fore.RED+"*******************  Invalid deployment name  **********************   ")
                 return
             else:
@@ -130,7 +131,7 @@ class kubeOps:
                     print(Fore.GREEN+"*******************  Rolling update completed  **********************   ")
                     print(Style.RESET_ALL)
                     stdin,stdout, stderr= self.ssh.exec_command(" kubectl rollout status deployment nginx-deployment")
-                    self.showSSHOutput(stdout.readlines())
+                    self.showSSHOutPutLongRunningCommand(stdout)
                     self.showSSHOutput(stderr.readlines())
                 else:
                     deploymentName="busybox-deployment"
@@ -143,7 +144,7 @@ class kubeOps:
                     print(Fore.GREEN+"*******************  Rolling update completed  **********************   ")
                     print(Style.RESET_ALL)
                     stdin,stdout, stderr= self.ssh.exec_command("kubectl rollout status deployment busybox-deployment")
-                    self.showSSHOutput(stdout.readlines())
+                    self.showSSHOutPutLongRunningCommand(stdout)
                     self.showSSHOutput(stderr.readlines())
         except Exception as e:
             print(Fore.RED+"*******************  Error: "+e+"  **********************   ")
